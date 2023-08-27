@@ -9,7 +9,7 @@ Each package integration has its own directory containing the `integrate.yml` co
 ### Repository Structure
 
 ```
-integrate-configs/
+packages/
 ├── @react-native-firebase/app/
 │   ├── integrate.yml
 ├── @react-native-firebase/crashlytics/
