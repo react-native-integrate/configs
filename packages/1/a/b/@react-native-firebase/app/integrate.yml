@@ -1,6 +1,45 @@
 tasks:
+  - type: fs
+    label: Importing google-services.json
+    updates:
+      - copyFile: google-services.json
+        destination: android/app/google-services.json
+
+  - type: build_gradle
+    label: Adding classpath to build.gradle
+    updates:
+      - block: buildscript.dependencies
+        before: //
+        append: classpath 'com.google.gms:google-services:4.3.15'
+
+  - type: build_gradle
+    label: Adding plugin execution to app/build.gradle
+    location: app
+    updates:
+      - after: com.android.application
+        prepend: "apply plugin: 'com.google.gms.google-services'"
+
+  - type: ios_resources
+    label: Importing GoogleService-Info.plist
+    updates:
+      - addFile: GoogleService-Info.plist
+        target: root
+
   - type: app_delegate
-    imports:
-      - <Firebase.h>
-    method: didFinishLaunchingWithOptions
-    prepend: "[FIRApp configure];"
+    label: Adding initialization to App Delegate
+    updates:
+      - prepend: "#import <Firebase.h>"
+      - block: didFinishLaunchingWithOptions
+        prepend: "[FIRApp configure];"
+
+  - type: podfile
+    label: Altering CocoaPods to use frameworks
+    updates:
+      - prepend: "$RNFirebaseAsStaticFramework = true"
+      - search: "linkage = ENV['USE_FRAMEWORKS']"
+        replace: "linkage = 'static'"
+
+      # old podfile template support
+      - ifNotPresent: "linkage ="
+        before: target
+        append: "use_frameworks! :linkage => :static"
