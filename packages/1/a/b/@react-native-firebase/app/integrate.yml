@@ -39,7 +39,7 @@ tasks:
       - after: com.android.application
         prepend: "apply plugin: 'com.google.gms.google-services'"
 
-  - type: ios_resources
+  - type: xcode
     label: Importing GoogleService-Info.plist
     when:
       platform: ios
