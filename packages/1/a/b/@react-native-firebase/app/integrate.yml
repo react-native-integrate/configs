@@ -64,6 +64,10 @@ tasks:
       - prepend: "$RNFirebaseAsStaticFramework = true"
       - search: "linkage = ENV['USE_FRAMEWORKS']"
         replace: "linkage = 'static'"
+      - search:
+          regex: ":flipper_configuration =>.*?,"
+          flags: s
+        replace: ":flipper_configuration => FlipperConfiguration.disabled"
 
       # old podfile template support
       - ifNotPresent: "linkage ="
