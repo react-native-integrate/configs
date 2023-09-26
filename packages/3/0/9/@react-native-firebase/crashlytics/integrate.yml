@@ -1,0 +1,25 @@
+tasks:
+  - type: build_gradle
+    label: Adding classpath to build.gradle
+    when:
+      platform: android
+    actions:
+      - block: buildscript.dependencies
+        before: //
+        append: classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+
+  - type: build_gradle
+    label: Adding plugin execution to app/build.gradle
+    when:
+      platform: android
+    location: app
+    actions:
+      - after: com.google.gms.google-services
+        prepend: "apply plugin: 'com.google.firebase.crashlytics'"
+
+postInfo:
+  title: Testing crashlytics
+  message: |-
+    By default Crashlytics only works in production.
+    Check the link below for details:
+    https://invertase.io/blog/react-native-firebase-crashlytics-configuration
