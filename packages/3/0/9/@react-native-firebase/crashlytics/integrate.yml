@@ -1,8 +1,6 @@
 tasks:
   - type: build_gradle
     label: Adding classpath to build.gradle
-    when:
-      platform: android
     actions:
       - block: buildscript.dependencies
         before: //
@@ -10,8 +8,6 @@ tasks:
 
   - type: build_gradle
     label: Adding plugin execution to app/build.gradle
-    when:
-      platform: android
     location: app
     actions:
       - after: com.google.gms.google-services
