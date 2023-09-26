@@ -67,7 +67,7 @@ tasks:
       - search:
           regex: ":flipper_configuration =>.*?,"
           flags: s
-        replace: ":flipper_configuration => FlipperConfiguration.disabled"
+        replace: ":flipper_configuration => FlipperConfiguration.disabled,"
 
       # old podfile template support
       - ifNotPresent: "linkage ="
