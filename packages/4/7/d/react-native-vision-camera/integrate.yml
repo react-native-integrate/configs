@@ -1,8 +1,9 @@
-prompts:
-  - name: microphone
-    type: boolean
-    text: Are you planning to use microphone?
 tasks:
+  - type: prompt
+    actions:
+      - name: microphone
+        type: boolean
+        text: Are you planning to use microphone?
   - type: plist
     label: Updating Info.plist
     actions:
