@@ -3,16 +3,18 @@ tasks:
     actions:
       - name: microphone
         type: boolean
-        text: Are you planning to use microphone?
+        text: Add microphone permissions?
   - type: plist
     label: Updating Info.plist
     actions:
       - set:
           NSCameraUsageDescription: $(PRODUCT_NAME) needs access to your Camera.
+        strategy: append
       - when:
           microphone: true
         set:
           NSMicrophoneUsageDescription: $(PRODUCT_NAME) needs access to your Microphone.
+        strategy: append
   - type: android_manifest
     label: Updating android manifest
     actions:
