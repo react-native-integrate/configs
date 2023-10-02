@@ -4,15 +4,16 @@ preInfo:
     On the next prompt, you will be asked to select platforms to integrate.
     Please make sure you create a firebase project at https://console.firebase.google.com/
     and download google-services.json and/or GoogleService-Info.plist files.
-prompts:
-  - name: platform
-    text: "Select platforms to integrate:"
-    type: multiselect
-    options:
-      - value: android
-      - value: ios
-    required: true
 tasks:
+  - type: prompt
+    actions:
+      - name: platform
+        text: "Select platforms to integrate:"
+        type: multiselect
+        options:
+          - value: android
+          - value: ios
+        required: true
   - type: fs
     label: Importing google-services.json
     when:
