@@ -74,3 +74,4 @@ tasks:
       - ifNotPresent: "linkage ="
         before: target
         append: "use_frameworks! :linkage => :static"
+    postInfo: Podfile was changed, do not forget to run `pod install` after integration.
