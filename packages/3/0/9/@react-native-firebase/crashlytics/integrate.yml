@@ -13,9 +13,23 @@ tasks:
       - after: com.google.gms.google-services
         prepend: "apply plugin: 'com.google.firebase.crashlytics'"
 
-postInfo:
-  title: Testing crashlytics
-  message: |-
-    By default Crashlytics only works in production.
-    Check the link below for details:
-    https://invertase.io/blog/react-native-firebase-crashlytics-configuration
+  - type: prompt
+    actions:
+      - name: firebase_json
+        text: Would you like to enable debug logging in firebase.json
+        type: boolean
+
+  - type: json
+    label: Setting values in firebase.json
+    when:
+      firebase_json: true
+    path: firebase.json
+    actions:
+      - set:
+          react-native:
+            crashlytics_debug_enabled: true
+            crashlytics_disable_auto_disabler: true
+            crashlytics_auto_collection_enabled: true
+            crashlytics_is_error_generation_on_js_crash_enabled: true
+            crashlytics_javascript_exception_handler_chaining_enabled: true
+        strategy: merge
