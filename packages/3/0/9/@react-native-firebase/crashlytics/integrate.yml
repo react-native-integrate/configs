@@ -1,3 +1,5 @@
+dependencies:
+  - "@react-native-firebase/app"
 tasks:
   - type: build_gradle
     label: Adding classpath to build.gradle
