@@ -1,0 +1,87 @@
+env:
+  GROUP: group.$[IOS_BUNDLE_ID].onesignal
+
+preInfo:
+  title: Welcome to the react-native-onesignal integration.
+  message: |-
+    This flow will integrate OneSignal SDK into your project.
+
+tasks:
+  - type: xcode
+    label: Adding Notification Service Extension
+    actions:
+      - addTarget: OneSignalNotificationServiceExtension
+        name: notification.service
+        message: Enter the name of the notification service extension
+        type: notification-service
+
+  - type: xcode
+    label: Setting Deployment Target
+    actions:
+      # set root project target minimum deployment version to 11.0
+      - setDeploymentVersion:
+          min: 11
+        target: root
+
+      # set main target minimum deployment version to 11.0
+      - setDeploymentVersion:
+          min: 11
+        target: main
+
+      # set extension version to same as main
+      - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
+        target: $[notification.service.target]
+
+  - type: podfile
+    actions:
+      - search:
+          regex: platform :ios,.*
+        replace: platform :ios, '$[IOS_DEPLOYMENT_VERSION]'
+
+  - type: notification_service
+    label: Replacing NotificationService.m content
+    target: $[notification.service.target]
+    actions:
+      - replace:
+          file: ./.integrate/NotificationService.m
+
+  - type: podfile
+    label: Altering Podfile
+    actions:
+      # add notification service to the podfile
+      - append: |-
+
+          target '$[notification.service.target]' do
+            pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+          end
+        ifNotPresent: $[notification.service.target]
+
+  - type: xcode
+    label: Adding Groups
+    actions:
+      # add app groups capability
+      - addCapability: groups
+        target: main
+        groups:
+          - $[GROUP]
+
+      # add app groups capability to the extension
+      - addCapability: groups
+        target: $[notification.service.target]
+        groups:
+          - $[GROUP]
+
+  - type: xcode
+    label: Adding iOS Capabilities
+    actions:
+      # add push capability
+      - addCapability: push
+        target: main
+
+      # add background mode capability
+      - addCapability: background-mode
+        target: main
+        modes:
+          - remote-notification
+
+postInfo: Podfile was changed, do not forget to run `pod install` after integration.
