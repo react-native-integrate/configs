@@ -1,0 +1,213 @@
+env:
+  GROUP: group.$[IOS_BUNDLE_ID].insider
+
+preInfo:
+  title: Welcome to the react-native-insider integration.
+  message: |-
+    This flow will integrate Insider SDK into your project.
+
+tasks:
+  - type: prompt
+    actions:
+      - name: partner_name
+        type: text
+        text: Enter your Insider partner name
+      - name: geofence
+        type: boolean
+        text: Planning to use Geofence?
+
+  - type: build_gradle
+    label: Adding maven repo to project level build gradle
+    location: root
+    actions:
+      - block: allprojects.repositories
+        append: maven {url "https://mobilesdk.useinsider.com/android"}
+
+  - type: build_gradle
+    label: Declaring manifestPlaceholders in app level build gradle
+    location: app
+    actions:
+      - block: android.defaultConfig
+        append: manifestPlaceholders = [partner:"$[partner_name]"]
+
+  - type: android_manifest
+    label: Updating android manifest
+    actions:
+      - block: application
+        attributes:
+          android:allowBackup:
+            $delete: true
+      - when:
+          geofence: true
+        append: <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        before: <application
+      - when:
+          geofence: true
+        append: <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+        before: <application
+      - when:
+          geofence: true
+        append: <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+        before: <application
+
+  - type: xcode
+    label: Adding Notification Service Extension
+    actions:
+      - addTarget: InsiderNotificationService
+        name: notification.service
+        message: Enter the name of the notification service extension
+        type: notification-service
+      - addTarget: InsiderNotificationContent
+        name: notification.content
+        message: Enter the name of the notification content extension
+        type: notification-content
+
+  - type: xcode
+    label: Setting Deployment Target
+    actions:
+      # set root project target minimum deployment version to 10.0
+      - setDeploymentVersion:
+          min: 10
+        target: root
+
+      # set main target minimum deployment version to 10.0
+      - setDeploymentVersion:
+          min: 10
+        target: main
+
+      # set extension version to same as main
+      - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
+        target: $[notification.service.target]
+
+      # set extension version to same as main
+      - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
+        target: $[notification.content.target]
+
+  - type: podfile
+    label: Updating deployment version in podfile
+    actions:
+      - search:
+          regex: platform :ios,.*
+        replace: platform :ios, '$[IOS_DEPLOYMENT_VERSION]'
+
+  - type: notification_service
+    label: Replacing NotificationService.m content
+    target: $[notification.service.target]
+    actions:
+      - replace:
+          file: ./.integrate/NotificationService.m
+
+  - type: notification_view_controller
+    label: Replacing NotificationViewController.m content
+    target: $[notification.content.target]
+    actions:
+      - replace:
+          file: ./.integrate/NotificationViewController.m
+
+  - type: podfile
+    label: Altering Podfile
+    actions:
+      # add notification service to the podfile
+      - append: |-
+
+          target '$[notification.content.target]' do
+            inherit! :search_paths
+
+            # Pods for $[notification.content.target]
+            pod "InsiderMobileAdvancedNotification"
+          end
+        ifNotPresent: $[notification.content.target]
+      - append: |-
+
+          target '$[notification.service.target]' do
+            inherit! :search_paths
+
+            # Pods for $[notification.service.target]
+            pod "InsiderMobileAdvancedNotification"
+          end
+        ifNotPresent: $[notification.service.target]
+
+      - search: "linkage = ENV['USE_FRAMEWORKS']"
+        replace: "linkage = 'dynamic'"
+      - search: "linkage = 'static'"
+        replace: "linkage = 'dynamic'"
+      - search:
+          regex: ":flipper_configuration =>.*?,"
+          flags: s
+        replace: ":flipper_configuration => FlipperConfiguration.disabled,"
+
+      # old podfile template support
+      - ifNotPresent: "linkage ="
+        before: target
+        append: "use_frameworks! :linkage => :dynamic"
+
+  - type: xcode
+    label: Adding Groups
+    actions:
+      # add app groups capability
+      - addCapability: groups
+        target: main
+        groups:
+          - $[GROUP]
+
+      # add app groups capability to the extension
+      - addCapability: groups
+        target: $[notification.service.target]
+        groups:
+          - $[GROUP]
+      - addCapability: groups
+        target: $[notification.content.target]
+        groups:
+          - $[GROUP]
+
+  - type: xcode
+    label: Adding iOS Capabilities
+    actions:
+      # add push capability
+      - addCapability: push
+        target: main
+
+      # add background mode capability
+      - addCapability: background-mode
+        target: main
+        modes:
+          - fetch
+          - remote-notification
+      - when:
+          geofence: true
+        addCapability: background-mode
+        target: main
+        modes:
+          - location
+
+  - type: plist
+    label: Updating Notification Content plist file
+    target: $[notification.content.target]
+    actions:
+      - set:
+          NSExtension:
+            NSExtensionAttributes:
+              NSExtensionAttributes: insider_int_push
+              UNNotificationExtensionDefaultContentHidden: YES
+              UNNotificationExtensionInitialContentSizeRatio: 0.5
+            NSExtensionMainStoryboard: InsiderInterface
+            NSExtensionPointIdentifier: com.apple.usernotifications.content-extension
+        strategy: assign
+
+  - type: plist
+    label: Adding url types
+    actions:
+      - set:
+          CFBundleURLTypes:
+            - CFBundleTypeRole: Editor
+              CFBundleURLName: insider
+              CFBundleURLSchemes:
+                - insider$[partner_name]
+        strategy: merge_distinct
+      - set:
+          NSLocationWhenInUseUsageDescription: $(PRODUCT_NAME) needs access to your location.
+          NSLocationAlwaysUsageDescription: $(PRODUCT_NAME) needs access to your location.
+          NSLocationAlwaysAndWhenInUseUsageDescription: $(PRODUCT_NAME) needs access to your location.
+        strategy: append
+
+postInfo: Podfile was changed, do not forget to run `pod install` after integration.
