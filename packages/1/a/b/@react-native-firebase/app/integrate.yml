@@ -63,15 +63,7 @@ tasks:
       platform: ios
     actions:
       - prepend: "$RNFirebaseAsStaticFramework = true"
-      - search: "linkage = ENV['USE_FRAMEWORKS']"
-        replace: "linkage = 'static'"
-      - search:
-          regex: ":flipper_configuration =>.*?,"
-          flags: s
-        replace: ":flipper_configuration => FlipperConfiguration.disabled,"
-
-      # old podfile template support
-      - ifNotPresent: "linkage ="
-        before: target
-        append: "use_frameworks! :linkage => :static"
+      # use dynamic frameworks and disable flipper
+      - useFrameworks: static
+        disableFlipper: true
     postInfo: Podfile was changed, do not forget to run `pod install` after integration.
