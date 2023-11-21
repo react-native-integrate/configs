@@ -107,6 +107,10 @@ tasks:
   - type: podfile
     label: Altering Podfile
     actions:
+      # use dynamic frameworks and disable flipper
+      - useFrameworks: dynamic
+        disableFlipper: true
+
       # add notification service to the podfile
       - append: |-
 
@@ -126,20 +130,6 @@ tasks:
             pod "InsiderMobileAdvancedNotification"
           end
         ifNotPresent: $[notification.service.target]
-
-      - search: "linkage = ENV['USE_FRAMEWORKS']"
-        replace: "linkage = 'dynamic'"
-      - search: "linkage = 'static'"
-        replace: "linkage = 'dynamic'"
-      - search:
-          regex: ":flipper_configuration =>.*?,"
-          flags: s
-        replace: ":flipper_configuration => FlipperConfiguration.disabled,"
-
-      # old podfile template support
-      - ifNotPresent: "linkage ="
-        before: target
-        append: "use_frameworks! :linkage => :dynamic"
 
   - type: xcode
     label: Adding Groups
