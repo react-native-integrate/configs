@@ -1,0 +1,137 @@
+preInfo:
+  title: Welcome to the react-native-code-push integration.
+  message: |-
+    This flow will integrate Code Push SDK into your project.
+    
+    Before proceeding, please retrieve your Code Push deployment keys.
+    You can retrieve these value by running 
+  
+        appcenter codepush deployment list -a <ownerName>/<appName> -k 
+  
+    in the CodePush CLI (the -k flag is necessary since keys aren't displayed 
+    by default) and copying the value of the Key column which corresponds 
+    to the deployment you want to use.
+
+tasks:
+  - type: prompt
+    actions:
+      - name: platform
+        text: "Select platforms to integrate:"
+        type: multiselect
+        options:
+          - value: android
+          - value: ios
+        required: true
+
+  - type: prompt
+    actions:
+      - name: android_key
+        when:
+          platform: android
+        text: "Enter Code Push deployment key for Android"
+        type: text
+      - name: ios_key
+        when:
+          platform: ios
+        text: "Enter Code Push deployment key for iOS"
+        type: text
+
+  - type: settings_gradle
+    when:
+      platform: android
+    actions:
+      - append: |-
+          include ':app', ':react-native-code-push'
+          project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
+
+  - type: build_gradle
+    when:
+      platform: android
+    location: app
+    actions:
+      - append: "apply from: \"../../node_modules/react-native-code-push/android/codepush.gradle\""
+
+  - type: main_application
+    when:
+      platform: android
+      RN_VERSION:
+        minor:
+          $lt: 73
+    actions:
+      - when:
+          CONTENT:
+            $not:
+              $regex: import com.microsoft.codepush.react.CodePush
+        before: import
+        append: import com.microsoft.codepush.react.CodePush;
+
+      - after:
+          regex: ReactNativeHost mReactNativeHost.*?{
+          flags: ms
+        strict: true
+        prepend: |2
+                  @Override
+                    protected String getJSBundleFile() {
+                    return CodePush.getJSBundleFile();
+                  }
+
+  - type: main_application
+    when:
+      platform: android
+      RN_VERSION:
+        minor:
+          $gte: 73
+    lang: kotlin
+    actions:
+      - when:
+          CONTENT:
+            $not:
+              $regex: import com.microsoft.codepush.react.CodePush
+        before: import
+        append: import com.microsoft.codepush.react.CodePush
+
+      - after:
+          regex: "reactNativeHost: ReactNativeHost.*?{"
+          flags: ms
+        strict: true
+        prepend: |2
+                  override fun getJSBundleFile(): String {
+                      return CodePush.getJSBundleFile()
+                  }
+
+  - type: strings_xml
+    when:
+      platform: android
+    actions:
+      - append: <string moduleConfig="true" name="CodePushDeploymentKey">$[android_key]</string>
+
+  - type: app_delegate
+    when:
+      platform: ios
+    actions:
+      - prepend: "#import <CodePush/CodePush.h>"
+      - search: return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+        replace: "  return [CodePush bundleURL];"
+
+  - type: plist
+    when:
+      platform: ios
+    actions:
+      - set:
+          CodePushDeploymentKey: $[ios_key]
+
+postInfo:
+  title: Js Integration
+  message: |-
+    As for last step, wrap your App component with codePush:
+    Replace:
+    
+        export default App;
+    
+    with
+    
+        export default codePush(App);
+    
+    Check documentation for details.
+    
+        https://github.com/microsoft/react-native-code-push/blob/master/docs/api-js.md
