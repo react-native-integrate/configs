@@ -1,0 +1,16 @@
+dependencies:
+  - "@react-native-firebase/app"
+tasks:
+  - type: xcode
+    label: Adding iOS Capabilities
+    actions:
+      # add push capability
+      - addCapability: push
+        target: main
+
+      # add background mode capability
+      - addCapability: background-mode
+        target: main
+        modes:
+          - fetch
+          - remote-notification
