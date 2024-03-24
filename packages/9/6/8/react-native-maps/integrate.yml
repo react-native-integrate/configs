@@ -82,3 +82,4 @@ tasks:
     actions:
       - set:
           NSLocationWhenInUseUsageDescription: $[ios_location_description]
+        strategy: append
