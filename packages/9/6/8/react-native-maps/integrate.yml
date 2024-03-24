@@ -1,0 +1,84 @@
+preInfo:
+  title: Welcome to the react-native-maps integration.
+  message: |-
+    On the next prompt, you will be asked to select platforms to integrate.
+    Getting Android API Key:
+      https://developers.google.com/maps/documentation/android-sdk/get-api-key
+    Getting iOS API Key:
+      https://developers.google.com/maps/documentation/ios-sdk/get-api-key
+    On iOS, the native Apple Maps implementation is used by default. 
+    Select only android platform if you do not intend to use iOS implementation.
+tasks: 
+  - type: prompt
+    actions:
+      - name: platform
+        text: "Select platforms to integrate:"
+        type: multiselect
+        options:
+          - value: android
+          - value: ios
+        required: true
+
+      - name: android_key
+        text: Specify your Android Google Maps API key
+        type: text
+
+      - name: ios_key
+        when:
+          platform: ios
+        text: Specify your iOS Google Maps API key
+        type: text
+
+      - name: ios_location_description
+        when:
+          platform: ios
+        text: Specify a text for NSLocationWhenInUseUsageDescription with a user-facing purpose string explaining clearly and completely why your app needs the location. This is required whether or not you are accessing the users location, as Google Maps iOS SDK contains the code required to access the users location.
+        type: text
+
+  - type: android_manifest
+    label: Adding your API key to your manifest file
+    actions:
+      - block: application
+        ifNotPresent: com.google.android.geo.API_KEY
+        append: |-
+          <!-- Google Maps -->
+            <meta-data
+              android:name="com.google.android.geo.API_KEY"
+              android:value="$[android_key]" />
+          <!-- Google Maps -->
+
+  - type: app_delegate
+    when:
+      platform: ios
+    label: Adding initialization to App Delegate
+    actions:
+      - prepend: "#import <GoogleMaps/GoogleMaps.h>"
+      - block: didFinishLaunchingWithOptions
+        prepend: "[GMSServices provideAPIKey:@"$[ios_key]"];"
+
+  - type: xcode
+    when:
+      platform: ios
+    label: Setting minimum deployment target in xcode project
+    actions:
+      - setDeploymentVersion:
+          min: 13.4
+        target: root
+
+  - type: podfile
+    when:
+      platform: ios
+    label: Setting minimum deployment target in Podfile
+    actions:
+      - search:
+          regex: platform :ios,.*
+        replace: platform :ios, '13.4'
+      - block: target
+        prepend: |-
+          rn_maps_path = '../node_modules/react-native-maps'
+          pod 'react-native-google-maps', :path => rn_maps_path
+
+  - type: plist
+    actions:
+      - set:
+          NSLocationWhenInUseUsageDescription: $[ios_location_description]
