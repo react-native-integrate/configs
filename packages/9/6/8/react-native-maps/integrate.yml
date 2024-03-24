@@ -54,7 +54,7 @@ tasks:
     actions:
       - prepend: "#import <GoogleMaps/GoogleMaps.h>"
       - block: didFinishLaunchingWithOptions
-        prepend: "[GMSServices provideAPIKey:@"$[ios_key]"];"
+        prepend: "[GMSServices provideAPIKey:@\"$[ios_key]\"];"
 
   - type: xcode
     when:
