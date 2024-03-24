@@ -1,0 +1,39 @@
+tasks:
+  - type: main_activity
+    label: Discarding activity state in MainActivity.java
+    lang: java
+    when:
+      RN_VERSION:
+        minor:
+          $lt: 73
+    actions:
+      - ifNotPresent: protected void onCreate
+        after: public class MainActivity
+        prepend: |-2
+          
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+              super.onCreate(null);
+            }
+      - before: public class MainActivity
+        ifNotPresent: import android.os.Bundle
+        append: "import android.os.Bundle;\n"
+
+  - type: main_activity
+    label: Discarding activity state in MainActivity.kt
+    lang: kotlin
+    when:
+      RN_VERSION:
+        minor:
+          $gte: 73
+    actions:
+      - ifNotPresent: protected void onCreate
+        before: class MainActivity
+        prepend: |-2
+
+            override fun onCreate(savedInstanceState: Bundle?) {
+              super.onCreate(null);
+            }
+      - before: public class MainActivity
+        ifNotPresent: import android.os.Bundle
+        append: "import android.os.Bundle\n"
