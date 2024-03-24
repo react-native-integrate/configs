@@ -79,6 +79,8 @@ tasks:
           pod 'react-native-google-maps', :path => rn_maps_path
 
   - type: plist
+    when:
+      platform: ios
     actions:
       - set:
           NSLocationWhenInUseUsageDescription: $[ios_location_description]
