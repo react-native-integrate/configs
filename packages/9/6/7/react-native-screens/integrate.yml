@@ -10,7 +10,7 @@ tasks:
       - ifNotPresent: protected void onCreate
         after: public class MainActivity
         prepend: |-2
-          
+        
             @Override
             protected void onCreate(Bundle savedInstanceState) {
               super.onCreate(null);
@@ -27,13 +27,13 @@ tasks:
         minor:
           $gte: 73
     actions:
-      - ifNotPresent: protected void onCreate
-        before: class MainActivity
+      - ifNotPresent: override fun onCreate
+        after: class MainActivity
         prepend: |-2
 
             override fun onCreate(savedInstanceState: Bundle?) {
               super.onCreate(null);
             }
-      - before: public class MainActivity
+      - before: class MainActivity
         ifNotPresent: import android.os.Bundle
         append: "import android.os.Bundle\n"
