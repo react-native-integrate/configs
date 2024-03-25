@@ -1,0 +1,56 @@
+tasks:
+  - type: prompt
+    actions:
+      - text: Select your requirements for this package so we can add appropriate descriptions to Info.plist
+        name: requirements
+        type: multiselect
+        required: true
+        options:
+          - label: Select image/video from photos
+            value: uses_library
+          - label: Capture Image
+            value: uses_camera_image
+          - label: Capture Video
+            value: uses_camera_video
+
+      - when:
+          requirements: uses_library
+        text: Enter library usage description to be added to Info.plist as NSPhotoLibraryUsageDescription
+        name: library_usage_description
+        type: text
+
+      - when:
+          requirements:
+            $in:
+              - uses_camera_image
+              - uses_camera_video
+        text: Enter camera usage description to be added to Info.plist as NSCameraUsageDescription
+        name: camera_usage_description
+        type: text
+
+      - when:
+          requirements: uses_camera_video
+        text: Enter microphone usage description to be added to Info.plist as NSMicrophoneUsageDescription
+        name: mic_usage_description
+        type: text
+
+  - type: plist
+    label: Adding usage descriptions to Info.plist
+    actions:
+      - when:
+          requirements: uses_library
+        set:
+          NSPhotoLibraryUsageDescription: $[library_usage_description]
+
+      - when:
+          requirements:
+            $in:
+              - uses_camera_image
+              - uses_camera_video
+        set:
+          NSCameraUsageDescription: $[camera_usage_description]
+
+      - when:
+          requirements: uses_camera_video
+        set:
+          NSMicrophoneUsageDescription: $[mic_usage_description]
