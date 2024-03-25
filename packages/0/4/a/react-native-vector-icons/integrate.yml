@@ -1,0 +1,33 @@
+tasks:
+  - type: plist
+    label: Adding fonts to Info.plist
+    actions:
+      - set:
+          UIAppFonts:
+            - AntDesign.ttf
+            - Entypo.ttf
+            - EvilIcons.ttf
+            - Feather.ttf
+            - FontAwesome.ttf
+            - FontAwesome5_Brands.ttf
+            - FontAwesome5_Regular.ttf
+            - FontAwesome5_Solid.ttf
+            - FontAwesome6_Brands.ttf
+            - FontAwesome6_Regular.ttf
+            - FontAwesome6_Solid.ttf
+            - Foundation.ttf
+            - Ionicons.ttf
+            - MaterialIcons.ttf
+            - MaterialCommunityIcons.ttf
+            - SimpleLineIcons.ttf
+            - Octicons.ttf
+            - Zocial.ttf
+            - Fontisto.ttf
+        strategy: merge_distinct
+
+  - type: build_gradle
+    label: Adding fonts to build.gradle
+    location: app
+    actions:
+      - append: |-
+          apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
