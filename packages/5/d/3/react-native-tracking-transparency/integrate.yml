@@ -1,0 +1,12 @@
+tasks:
+  - type: prompt
+    actions:
+      - text: Enter tracking usage description to be added to Info.plist as NSUserTrackingUsageDescription
+        name: usage_description
+        type: text
+
+  - type: plist
+    label: Adding usage descriptions to Info.plist
+    actions:
+      - set:
+          NSUserTrackingUsageDescription : $[usage_description]
