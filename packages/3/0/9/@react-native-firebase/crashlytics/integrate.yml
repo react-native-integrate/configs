@@ -1,27 +1,27 @@
 dependencies:
   - "@react-native-firebase/app"
-tasks:
-  - type: build_gradle
+steps:
+  - task: build_gradle
     label: Adding classpath to build.gradle
     actions:
       - block: buildscript.dependencies
         before: //
         append: classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
 
-  - type: build_gradle
+  - task: build_gradle
     label: Adding plugin execution to app/build.gradle
     location: app
     actions:
       - after: com.google.gms.google-services
         prepend: "apply plugin: 'com.google.firebase.crashlytics'"
 
-  - type: prompt
+  - task: prompt
     actions:
       - name: firebase_json
         text: Would you like to enable debug logging in firebase.json
         type: boolean
 
-  - type: json
+  - task: json
     label: Setting values in firebase.json
     when:
       firebase_json: true

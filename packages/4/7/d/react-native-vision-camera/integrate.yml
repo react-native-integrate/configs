@@ -1,10 +1,10 @@
-tasks:
-  - type: prompt
+steps:
+  - task: prompt
     actions:
       - name: microphone
         type: boolean
         text: Add microphone permissions?
-  - type: plist
+  - task: plist
     label: Updating Info.plist
     actions:
       - set:
@@ -15,7 +15,7 @@ tasks:
         set:
           NSMicrophoneUsageDescription: $(PRODUCT_NAME) needs access to your Microphone.
         strategy: append
-  - type: android_manifest
+  - task: android_manifest
     label: Updating android manifest
     actions:
       - block: manifest

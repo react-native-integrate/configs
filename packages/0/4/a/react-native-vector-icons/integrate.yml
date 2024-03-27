@@ -1,5 +1,5 @@
-tasks:
-  - type: plist
+steps:
+  - task: plist
     label: Adding fonts to Info.plist
     actions:
       - set:
@@ -25,7 +25,7 @@ tasks:
             - Fontisto.ttf
         strategy: merge_distinct
 
-  - type: build_gradle
+  - task: build_gradle
     label: Adding fonts to build.gradle
     location: app
     actions:

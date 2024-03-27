@@ -1,5 +1,5 @@
-tasks:
-  - type: prompt
+steps:
+  - task: prompt
     actions:
       - text: Select your requirements for this package so we can add appropriate descriptions to Info.plist
         name: requirements
@@ -34,7 +34,7 @@ tasks:
         name: mic_usage_description
         type: text
 
-  - type: plist
+  - task: plist
     label: Adding usage descriptions to Info.plist
     actions:
       - when:

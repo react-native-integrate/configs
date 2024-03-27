@@ -6,8 +6,8 @@ preInfo:
   message: |-
     This flow will integrate Insider SDK into your project.
 
-tasks:
-  - type: prompt
+steps:
+  - task: prompt
     actions:
       - name: partner_name
         type: text
@@ -16,21 +16,21 @@ tasks:
         type: boolean
         text: Planning to use Geofence?
 
-  - type: build_gradle
+  - task: build_gradle
     label: Adding maven repo to project level build gradle
     location: root
     actions:
       - block: allprojects.repositories
         append: maven {url "https://mobilesdk.useinsider.com/android"}
 
-  - type: build_gradle
+  - task: build_gradle
     label: Declaring manifestPlaceholders in app level build gradle
     location: app
     actions:
       - block: android.defaultConfig
         append: manifestPlaceholders = [partner:"$[partner_name]"]
 
-  - type: android_manifest
+  - task: android_manifest
     label: Updating android manifest
     actions:
       - block: application
@@ -50,7 +50,7 @@ tasks:
         append: <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
         before: <application
 
-  - type: xcode
+  - task: xcode
     label: Adding Notification Service Extension
     actions:
       - addTarget: InsiderNotificationService
@@ -62,7 +62,7 @@ tasks:
         message: Enter the name of the notification content extension
         type: notification-content
 
-  - type: xcode
+  - task: xcode
     label: Setting Deployment Target
     actions:
       # set root project target minimum deployment version to 10.0
@@ -83,28 +83,28 @@ tasks:
       - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
         target: $[notification.content.target]
 
-  - type: podfile
+  - task: podfile
     label: Updating deployment version in podfile
     actions:
       - search:
           regex: platform :ios,.*
         replace: platform :ios, '$[IOS_DEPLOYMENT_VERSION]'
 
-  - type: notification_service
+  - task: notification_service
     label: Replacing NotificationService.m content
     target: $[notification.service.target]
     actions:
       - replace:
           file: ./.integrate/NotificationService.m
 
-  - type: notification_view_controller
+  - task: notification_view_controller
     label: Replacing NotificationViewController.m content
     target: $[notification.content.target]
     actions:
       - replace:
           file: ./.integrate/NotificationViewController.m
 
-  - type: podfile
+  - task: podfile
     label: Altering Podfile
     actions:
       # use dynamic frameworks and disable flipper
@@ -131,7 +131,7 @@ tasks:
           end
         ifNotPresent: $[notification.service.target]
 
-  - type: xcode
+  - task: xcode
     label: Adding Groups
     actions:
       # add app groups capability
@@ -150,7 +150,7 @@ tasks:
         groups:
           - $[GROUP]
 
-  - type: xcode
+  - task: xcode
     label: Adding iOS Capabilities
     actions:
       # add push capability
@@ -170,7 +170,7 @@ tasks:
         modes:
           - location
 
-  - type: plist
+  - task: plist
     label: Updating Notification Content plist file
     target: $[notification.content.target]
     actions:
@@ -184,7 +184,7 @@ tasks:
             NSExtensionPointIdentifier: com.apple.usernotifications.content-extension
         strategy: assign
 
-  - type: plist
+  - task: plist
     label: Adding url types
     actions:
       - set:

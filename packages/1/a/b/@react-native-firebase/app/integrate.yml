@@ -4,8 +4,8 @@ preInfo:
     On the next prompt, you will be asked to select platforms to integrate.
     Please make sure you create a firebase project at https://console.firebase.google.com/
     and download google-services.json and/or GoogleService-Info.plist files.
-tasks:
-  - type: prompt
+steps:
+  - task: prompt
     actions:
       - name: platform
         text: "Select platforms to integrate:"
@@ -14,7 +14,7 @@ tasks:
           - value: android
           - value: ios
         required: true
-  - type: fs
+  - task: fs
     label: Importing google-services.json
     when:
       platform: android
@@ -22,7 +22,7 @@ tasks:
       - copyFile: google-services.json
         destination: android/app/google-services.json
 
-  - type: build_gradle
+  - task: build_gradle
     label: Adding classpath to build.gradle
     when:
       platform: android
@@ -31,7 +31,7 @@ tasks:
         before: //
         append: classpath 'com.google.gms:google-services:4.3.15'
 
-  - type: build_gradle
+  - task: build_gradle
     label: Adding plugin execution to app/build.gradle
     when:
       platform: android
@@ -40,7 +40,7 @@ tasks:
       - after: com.android.application
         prepend: "apply plugin: 'com.google.gms.google-services'"
 
-  - type: xcode
+  - task: xcode
     label: Importing GoogleService-Info.plist
     when:
       platform: ios
@@ -48,7 +48,7 @@ tasks:
       - addFile: GoogleService-Info.plist
         target: root
 
-  - type: app_delegate
+  - task: app_delegate
     label: Adding initialization to App Delegate
     when:
       platform: ios
@@ -57,7 +57,7 @@ tasks:
       - block: didFinishLaunchingWithOptions
         prepend: "[FIRApp configure];"
 
-  - type: podfile
+  - task: podfile
     label: Altering CocoaPods to use frameworks
     when:
       platform: ios

@@ -3,19 +3,19 @@ preInfo:
   message: |-
     This flow will integrate React Native Config into your project.
 
-tasks:
-  - type: build_gradle
+steps:
+  - task: build_gradle
     location: app
     actions:
       - append: "apply from: project(':react-native-config').projectDir.getPath() + \"/dotenv.gradle\""
 
-  - type: xcode
+  - task: xcode
     actions:
       - addConfiguration: "#include? \"tmp.xcconfig\""
       - addPreBuildRunScriptAction: |-
           "${SRCROOT}/../node_modules/react-native-config/ios/ReactNativeConfig/BuildXCConfig.rb" "${SRCROOT}/.." "${SRCROOT}/tmp.xcconfig"
 
-  - type: gitignore
+  - task: gitignore
     actions:
       - append: ios/tmp.xcconfig
         comment: react-native-config codegen

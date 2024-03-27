@@ -1,7 +1,7 @@
 dependencies:
   - "@react-native-firebase/app"
-tasks:
-  - type: xcode
+steps:
+  - task: xcode
     label: Adding iOS Capabilities
     actions:
       # add push capability

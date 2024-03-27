@@ -1,5 +1,5 @@
-tasks:
-  - type: main_activity
+steps:
+  - task: main_activity
     label: Discarding activity state in MainActivity.java
     lang: java
     when:
@@ -19,7 +19,7 @@ tasks:
         ifNotPresent: import android.os.Bundle
         append: "import android.os.Bundle;\n"
 
-  - type: main_activity
+  - task: main_activity
     label: Discarding activity state in MainActivity.kt
     lang: kotlin
     when:

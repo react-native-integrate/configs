@@ -8,8 +8,8 @@ preInfo:
       https://developers.google.com/maps/documentation/ios-sdk/get-api-key
     On iOS, the native Apple Maps implementation is used by default. 
     Select only android platform if you do not intend to use iOS implementation.
-tasks: 
-  - type: prompt
+steps: 
+  - task: prompt
     actions:
       - name: platform
         text: "Select platforms to integrate:"
@@ -35,7 +35,7 @@ tasks:
         text: Specify a text for NSLocationWhenInUseUsageDescription with a user-facing purpose string explaining clearly and completely why your app needs the location. This is required whether or not you are accessing the users location, as Google Maps iOS SDK contains the code required to access the users location.
         type: text
 
-  - type: android_manifest
+  - task: android_manifest
     label: Adding your API key to your manifest file
     actions:
       - block: application
@@ -47,7 +47,7 @@ tasks:
               android:value="$[android_key]" />
           <!-- Google Maps -->
 
-  - type: app_delegate
+  - task: app_delegate
     when:
       platform: ios
     label: Adding initialization to App Delegate
@@ -56,7 +56,7 @@ tasks:
       - block: didFinishLaunchingWithOptions
         prepend: "[GMSServices provideAPIKey:@\"$[ios_key]\"];"
 
-  - type: xcode
+  - task: xcode
     when:
       platform: ios
     label: Setting minimum deployment target in xcode project
@@ -65,7 +65,7 @@ tasks:
           min: 13.4
         target: root
 
-  - type: podfile
+  - task: podfile
     when:
       platform: ios
     label: Setting minimum deployment target in Podfile
@@ -78,7 +78,7 @@ tasks:
           rn_maps_path = '../node_modules/react-native-maps'
           pod 'react-native-google-maps', :path => rn_maps_path
 
-  - type: plist
+  - task: plist
     when:
       platform: ios
     actions:

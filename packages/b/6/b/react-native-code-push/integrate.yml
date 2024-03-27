@@ -12,8 +12,8 @@ preInfo:
     by default) and copying the value of the Key column which corresponds 
     to the deployment you want to use.
 
-tasks:
-  - type: prompt
+steps:
+  - task: prompt
     actions:
       - name: platform
         text: "Select platforms to integrate:"
@@ -23,7 +23,7 @@ tasks:
           - value: ios
         required: true
 
-  - type: prompt
+  - task: prompt
     actions:
       - name: android_key
         when:
@@ -36,7 +36,7 @@ tasks:
         text: "Enter Code Push deployment key for iOS"
         type: text
 
-  - type: settings_gradle
+  - task: settings_gradle
     when:
       platform: android
     actions:
@@ -44,14 +44,14 @@ tasks:
           include ':app', ':react-native-code-push'
           project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
 
-  - type: build_gradle
+  - task: build_gradle
     when:
       platform: android
     location: app
     actions:
       - append: "apply from: \"../../node_modules/react-native-code-push/android/codepush.gradle\""
 
-  - type: main_application
+  - task: main_application
     when:
       platform: android
       RN_VERSION:
@@ -75,7 +75,7 @@ tasks:
                     return CodePush.getJSBundleFile();
                   }
 
-  - type: main_application
+  - task: main_application
     when:
       platform: android
       RN_VERSION:
@@ -99,13 +99,13 @@ tasks:
                       return CodePush.getJSBundleFile()
                   }
 
-  - type: strings_xml
+  - task: strings_xml
     when:
       platform: android
     actions:
       - append: <string moduleConfig="true" name="CodePushDeploymentKey">$[android_key]</string>
 
-  - type: app_delegate
+  - task: app_delegate
     when:
       platform: ios
     actions:
@@ -113,7 +113,7 @@ tasks:
       - search: return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
         replace: "  return [CodePush bundleURL];"
 
-  - type: plist
+  - task: plist
     when:
       platform: ios
     actions:
