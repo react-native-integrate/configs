@@ -1,0 +1,6 @@
+steps:
+  - task: babel_config
+    label: Adding plugin in babel.config.js
+    actions:
+      - block: plugins
+        append: react-native-reanimated/plugin
