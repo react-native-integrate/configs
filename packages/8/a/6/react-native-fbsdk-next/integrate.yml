@@ -1,0 +1,85 @@
+steps:
+  - task: prompt
+    actions:
+      - name: platform
+        text: "Select platforms to integrate:"
+        type: multiselect
+        options:
+          - value: android
+          - value: ios
+        required: true
+
+      - name: android_app_id
+        when:
+          platform: android
+        text: "Enter FB app id for Android"
+        type: text
+      - name: android_client_token
+        when:
+          platform: android
+        text: "Enter FB client token for Android"
+        type: text
+      - name: ios_app_id
+        when:
+          platform: ios
+        text: "Enter FB app id for iOS"
+        type: text
+      - name: ios_client_token
+        when:
+          platform: ios
+        text: "Enter FB client token for iOS"
+        type: text
+      - name: ios_display_name
+        when:
+          platform: ios
+        text: "Enter FB display name for iOS"
+        type: text
+
+  - task: android_manifest
+    label: Adding application id to AndroidManifest.xml
+    when:
+      platform: android
+    actions:
+      - block: application
+        append: |
+          <meta-data
+              android:name="com.facebook.sdk.ApplicationId"
+              android:value="@string/facebook_app_id" />
+          <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+
+  - task: strings_xml
+    label: Adding api key to strings.xml
+    when:
+      platform: android
+    actions:
+      - append: |
+          <string name="facebook_app_id">$[android_app_id]</string>
+      - append: |
+          <string name="facebook_client_token">$[android_client_token]</string>
+      - append: |
+          <string name="fb_login_protocol_scheme">fb$[android_app_id]</string>
+
+  - task: plist
+    label: Setting additional keys in Info.plist
+    when:
+      platform: ios
+    actions:
+      - set:
+          CFBundleURLTypes:
+            - CFBundleURLSchemes:
+                - fb$[ios_app_id]
+        strategy: merge_distinct
+
+      - set:
+          LSApplicationQueriesSchemes:
+            - fbapi
+            - fb-messenger-share-api
+            - fbauth2
+            - fbshareextension
+        strategy: merge_distinct
+
+      - set:
+          FacebookAppID: $[ios_app_id]
+          FacebookClientToken: $[ios_client_token]
+          FacebookDisplayName: $[ios_display_name]
+        strategy: assign
