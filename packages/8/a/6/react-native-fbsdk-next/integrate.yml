@@ -41,6 +41,7 @@ steps:
       platform: android
     actions:
       - block: application
+        ifNotPresent: com.facebook.sdk.ApplicationId
         append: |
           <meta-data
               android:name="com.facebook.sdk.ApplicationId"
