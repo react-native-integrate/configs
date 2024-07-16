@@ -1,0 +1,10 @@
+steps:
+  - task: build_gradle
+    label: Adding maven repo to build.gradle
+    location: root
+    actions:
+      - block: allprojects.repositories
+        append: |-2
+          maven {
+              url "$rootDir/../node_modules/react-native-video-cache/android/libs"
+          }
