@@ -35,6 +35,16 @@ steps:
               login mapbox
               password $[ios_key]
 
+  - task: podfile
+    when:
+      platform: ios
+    label: Adding code in Podfile
+    actions:
+      - block: target.pre_install
+        append: $RNMapboxMaps.pre_install(installer)
+      - block: target.post_install
+        append: $RNMapboxMaps.post_install(installer)
+
   - task: gradle_properties
     label: Adding token to gradle properties
     when:
