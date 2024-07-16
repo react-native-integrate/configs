@@ -1,0 +1,73 @@
+steps:
+  - task: main_activity
+    label: Adding code in MainActivity.java
+    lang: java
+    when:
+      RN_VERSION:
+        minor:
+          $lt: 73
+    actions:
+      - ifNotPresent: protected void onCreate
+        after: public class MainActivity
+        prepend: |-2
+
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+              super.onCreate(null);
+            }
+
+      - after: protected void onCreate
+        ifNotPresent: SplashScreen.show
+        prepend: |-2
+              SplashScreen.show(this);
+
+      - before: public class MainActivity
+        ifNotPresent: import org.devio.rn.splashscreen.SplashScreen
+        append: "import org.devio.rn.splashscreen.SplashScreen;\n"
+
+  - task: main_activity
+    label: Adding code in MainActivity.kt
+    lang: kotlin
+    when:
+      RN_VERSION:
+        minor:
+          $gte: 73
+    actions:
+      - ifNotPresent: override fun onCreate
+        after: class MainActivity
+        prepend: |-2
+
+            override fun onCreate(savedInstanceState: Bundle?) {
+              super.onCreate(null);
+            }
+
+      - after: override fun onCreate
+        ifNotPresent: SplashScreen.show
+        prepend: |-2
+              SplashScreen.show(this);
+
+      - before: class MainActivity
+        ifNotPresent: import org.devio.rn.splashscreen.SplashScreen
+        append: "import org.devio.rn.splashscreen.SplashScreen\n"
+
+  - task: app_delegate
+    label: Modifying AppDelegate.mm
+    actions:
+      - prepend: '#import "RNSplashScreen.h"'
+
+      - block: didFinishLaunchingWithOptions
+        name: replacer
+        ifNotPresent: RNSplashScreen show
+        search: return [super application:application didFinishLaunchingWithOptions:launchOptions];
+        replace: |-2
+          BOOL success = [super application:application didFinishLaunchingWithOptions:launchOptions];
+          if (success)
+            [RNSplashScreen show];
+          return success;
+
+      - when:
+          replacer: skipped
+        block: didFinishLaunchingWithOptions
+        ifNotPresent: RNSplashScreen show
+        before: return
+        append: '[RNSplashScreen show];'
