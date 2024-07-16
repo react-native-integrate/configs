@@ -1,0 +1,67 @@
+steps:
+  - task: prompt
+    actions:
+      - name: platform
+        text: "Select platforms to integrate:"
+        type: multiselect
+        options:
+          - value: android
+          - value: ios
+        required: true
+
+      - name: android_key
+        when:
+          platform: android
+        text: "Enter Mapbox Downloads Token for Android"
+        type: text
+
+  - task: prompt
+    when:
+      platform: ios
+    actions:
+      - name: ios_key
+        text: "Enter Mapbox Downloads Token for Ios"
+        type: text
+    postInfo:
+      title: Verify .netrc
+      message: |
+        Make sure your .netrc is configured with your secret access token, as described by the mapbox docs. To verify execute:
+  
+            grep -A 4 api.mapbox.com ~/.netrc
+        
+        This should output something like:
+  
+            machine api.mapbox.com
+              login mapbox
+              password $[ios_key]
+
+  - task: gradle_properties
+    label: Adding token to gradle properties
+    when:
+      platform: android
+    actions:
+      - ifNotPresent: MAPBOX_DOWNLOADS_TOKEN
+        append: |
+          MAPBOX_DOWNLOADS_TOKEN=$[android_key]
+
+  - task: build_gradle
+    location: root
+    label: Adding code to build.gradle
+    when:
+      platform: android
+    actions:
+      - block: allprojects.repositories
+        append: |-2
+          maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // Do not change the username below.
+                // This should always be `mapbox` (not your username).
+                username = 'mapbox'
+                // Use the secret token you stored in gradle.properties as the password
+                password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+            }
+          }
