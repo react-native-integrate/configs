@@ -1,0 +1,50 @@
+steps:
+  - task: prompt
+    preInfo: |
+      You need to select an ffmpeg package type to continue. Check this link for detailed table
+
+          https://github.com/arthenica/ffmpeg-kit?tab=readme-ov-file#9-packages
+
+    actions:
+      - name: type
+        text: "Select ffmpeg package type to integrate:"
+        type: select
+        initialValue: https
+        options:
+          - value: min
+          - value: min-gpl
+          - value: https
+          - value: https-gpl
+          - value: audio
+          - value: video
+          - value: full
+          - value: full-gpl
+
+      - name: lts
+        text: "LTS Release?"
+        type: select
+        options:
+          - value: ''
+            label: no
+            hint: min android 24 - ios 12.1
+
+          - value: '-lts'
+            label: yes
+            hint: min android 16 - ios 10
+
+  - task: build_gradle
+    label: Adding package in build.gradle
+    location: root
+    actions:
+      - block: buildscript.ext
+        ifNotPresent: ffmpegKitPackage
+        append: ffmpegKitPackage = "$[type]$[lts]"
+
+  - task: podfile
+    label: Adding package in Podfile
+    actions:
+      - block: target
+        ifNotPresent: pod 'ffmpeg-kit-react-native'
+        after: use_frameworks
+        prepend: pod 'ffmpeg-kit-react-native', :subspecs => ['$[type]$[lts]'], :podspec => '../node_modules/ffmpeg-kit-react-native/ffmpeg-kit-react-native.podspec'
+
