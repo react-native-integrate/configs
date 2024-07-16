@@ -4,6 +4,9 @@ steps:
     location: root
     actions:
       - block: buildscript.ext
-        append: |-
-          androidXBrowser = "1.5.0"
-          androidXCore = "1.6.0"
+        ifNotPresent: androidXBrowser
+        append: androidXBrowser = "1.5.0"
+
+      - block: buildscript.ext
+        ifNotPresent: androidXCore
+        append: androidXCore = "1.6.0"
