@@ -1,0 +1,9 @@
+steps:
+  - task: build_gradle
+    label: Adding androidX versions in build.gradle
+    location: root
+    actions:
+      - block: buildscript.ext
+        append: |-
+          androidXBrowser = "1.5.0"
+          androidXCore = "1.6.0"
