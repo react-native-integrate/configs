@@ -1,0 +1,58 @@
+steps:
+  - task: podfile
+    label: Adding permission usage in Podfile
+    actions:
+      - ifNotPresent: react-native-permissions/scripts/setup.rb
+        after:
+          regex: require.*?scripts/react_native_pods\.rb.*?.strip
+          flags: s
+        prepend: |
+          require Pod::Executable.execute_command('node', ['-p',
+            'require.resolve(
+              "react-native-permissions/scripts/setup.rb",
+              {paths: [process.argv[1]]},
+            )', __dir__]).strip
+          
+
+      - ifNotPresent: react-native-permissions/scripts/setup.rb
+        after: prepare_react_native_project!
+        prepend: |
+          
+          # ⬇️ uncomment the permissions you need
+          setup_permissions([
+            # 'AppTrackingTransparency',
+            # 'Bluetooth',
+            # 'Calendars',
+            # 'CalendarsWriteOnly',
+            # 'Camera',
+            # 'Contacts',
+            # 'FaceID',
+            # 'LocationAccuracy',
+            # 'LocationAlways',
+            # 'LocationWhenInUse',
+            # 'MediaLibrary',
+            # 'Microphone',
+            # 'Motion',
+            # 'Notifications',
+            # 'PhotoLibrary',
+            # 'PhotoLibraryAddOnly',
+            # 'Reminders',
+            # 'Siri',
+            # 'SpeechRecognition',
+            # 'StoreKit',
+          ])
+
+postInfo: |
+  Please uncomment required permissions in your Podfile. You can set up a task in upgrade.yml to set permissions automatically while upgrading.
+
+      - task: podfile
+        label: Setting permissions in Podfile
+        actions:
+          - search:
+              regex: setup_permissions\(\[.*\]\)
+              flags: s
+            replace: |
+              setup_permissions([
+                'Camera',
+                'LocationAlways',
+              ])
