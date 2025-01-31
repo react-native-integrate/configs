@@ -50,12 +50,29 @@ steps:
 
   - task: app_delegate
     label: Adding initialization to App Delegate
+    lang: objc
     when:
       platform: ios
+      RN_VERSION:
+        minor:
+          $lt: 77
     actions:
       - prepend: "#import <Firebase.h>"
       - block: didFinishLaunchingWithOptions
         prepend: "[FIRApp configure];"
+
+  - task: app_delegate
+    label: Adding initialization to App Delegate
+    lang: swift
+    when:
+      platform: ios
+      RN_VERSION:
+        minor:
+          $gte: 77
+    actions:
+      - prepend: "import Firebase"
+      - block: didFinishLaunchingWithOptions
+        prepend: "FirebaseApp.configure()"
 
   - task: podfile
     label: Altering CocoaPods to use frameworks
