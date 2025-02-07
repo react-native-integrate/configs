@@ -1,0 +1,6 @@
+steps:
+  - task: babel_config
+    label: Adding to babel.config.js
+    actions:
+      - block: plugins
+        prepend: babel-plugin-transform-typescript-metadata
