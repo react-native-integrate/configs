@@ -1,0 +1,20 @@
+steps:
+  - task: prompt
+    actions:
+      - type: select
+        name: version
+        text: "Select the decorators proposal to use:"
+        options:
+          - value: 2023-11
+            label: 2023-11
+            hint: '"2023-11" is the proposal version after the updates that reached consensus in the November 2023 TC39 meetings.'
+          - value: legacy
+            label: legacy
+            hint: legacy is the legacy Stage 1 proposal. The legacy mode will not have feature updates, and there are known discrepancies between Babel and TypeScript. It's recommended to migrate to the "2023-11" proposal.
+  - task: babel_config
+    label: Adding to babel.config.js
+    actions:
+      - block: plugins
+        ifNotPresent: "@babel/plugin-proposal-decorators"
+        prepend: |-
+          ["@babel/plugin-proposal-decorators", {"version": "$[version]"}]
