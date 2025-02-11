@@ -84,3 +84,33 @@ steps:
           FacebookClientToken: $[ios_client_token]
           FacebookDisplayName: $[ios_display_name]
         strategy: assign
+
+  - task: app_delegate
+    label: Adding initialization to App Delegate
+    lang: objc
+    when:
+      platform: ios
+      RN_VERSION:
+        minor:
+          $lt: 77
+    actions:
+      - prepend: "#import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>"
+      - prepend: "#import <SafariServices/SafariServices.h>"
+      - prepend: "#import <AuthenticationServices/AuthenticationServices.h>"
+      - block: didFinishLaunchingWithOptions
+        prepend: |-
+          [[FBSDKApplicationDelegate sharedInstance] application:application
+                             didFinishLaunchingWithOptions:launchOptions];
+
+  - task: app_delegate
+    label: Adding initialization to App Delegate
+    lang: swift
+    when:
+      platform: ios
+      RN_VERSION:
+        minor:
+          $gte: 77
+    actions:
+      - prepend: "import FBSDKCoreKit"
+      - block: didFinishLaunchingWithOptions
+        prepend: "ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)"
