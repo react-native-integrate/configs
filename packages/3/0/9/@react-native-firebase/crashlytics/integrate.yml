@@ -6,7 +6,7 @@ steps:
     actions:
       - block: buildscript.dependencies
         before: //
-        append: classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+        append: classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'
 
   - task: build_gradle
     label: Adding plugin execution to app/build.gradle
