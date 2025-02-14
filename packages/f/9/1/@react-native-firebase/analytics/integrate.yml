@@ -1,0 +1,7 @@
+dependencies:
+  - "@react-native-firebase/app"
+steps:
+  - task: podfile
+    label: Altering CocoaPods to enable AdSupport
+    actions:
+      - prepend: "$RNFirebaseAnalyticsEnableAdSupport = true"
