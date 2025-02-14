@@ -1,0 +1,7 @@
+steps:
+  - task: build_gradle
+    label: Add Google Play Services
+    location: app
+    actions:
+      - block: dependencies
+        append: implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
