@@ -1,0 +1,27 @@
+steps:
+  - task: prompt
+    actions:
+      - name: mimeType
+        type: text
+        text: 'Enter file mime type to support'
+        placeholder: "Ex: application/pdf"
+        validate:
+          - regex: ^.+$
+            message: Field is required
+
+  - task: android_manifest
+    label: "Adding queries in manifest"
+    actions:
+      - block: manifest
+        ifNotPresent: <queries>
+        append: |-
+          <queries>
+          </queries>
+      - block: manifest
+        before: </queries>
+        ifNotPresent: android:mimeType="$[mimeType]"
+        append: |-2
+              <intent>
+                  <action android:name="android.intent.action.VIEW" />
+                  <data android:mimeType="$[mimeType]" />
+              </intent>
