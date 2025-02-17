@@ -14,7 +14,7 @@ steps:
             )', __dir__]).strip
           
 
-      - ifNotPresent: react-native-permissions/scripts/setup.rb
+      - ifNotPresent: setup_permissions
         after: prepare_react_native_project!
         prepend: |
           
