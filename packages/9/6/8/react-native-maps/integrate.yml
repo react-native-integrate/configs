@@ -1,3 +1,6 @@
+env:
+  MIN_IOS_VERSION: 13.4
+
 preInfo:
   title: Welcome to the react-native-maps integration.
   message: |-
@@ -61,8 +64,14 @@ steps:
       platform: ios
     label: Setting minimum deployment target in xcode project
     actions:
+      # set root project target minimum deployment version to MIN_IOS_VERSION
       - setDeploymentVersion:
-          min: 13.4
+          min: $[MIN_IOS_VERSION]
+        target: main
+
+      # set main target minimum deployment version to MIN_IOS_VERSION
+      - setDeploymentVersion:
+          min: $[MIN_IOS_VERSION]
         target: root
 
   - task: podfile
@@ -72,7 +81,7 @@ steps:
     actions:
       - search:
           regex: platform :ios,.*
-        replace: platform :ios, '13.4'
+        replace: platform :ios, '$[IOS_DEPLOYMENT_VERSION]'
       - block: target
         prepend: |-
           rn_maps_path = '../node_modules/react-native-maps'
