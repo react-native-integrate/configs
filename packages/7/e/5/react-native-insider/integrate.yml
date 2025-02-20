@@ -1,5 +1,6 @@
 env:
   GROUP: group.$[IOS_BUNDLE_ID].insider
+  MIN_IOS_VERSION: 10
 
 preInfo:
   title: Welcome to the react-native-insider integration.
@@ -70,15 +71,15 @@ steps:
   - task: xcode
     label: Setting Deployment Target
     actions:
-      # set root project target minimum deployment version to 10.0
+      # set root project target minimum deployment version to MIN_IOS_VERSION
       - setDeploymentVersion:
-          min: 10
-        target: root
-
-      # set main target minimum deployment version to 10.0
-      - setDeploymentVersion:
-          min: 10
+          min: $[MIN_IOS_VERSION]
         target: main
+
+      # set main target minimum deployment version to MIN_IOS_VERSION
+      - setDeploymentVersion:
+          min: $[MIN_IOS_VERSION]
+        target: root
 
       # set extension version to same as main
       - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
