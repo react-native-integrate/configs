@@ -1,5 +1,6 @@
 env:
   GROUP: group.$[IOS_BUNDLE_ID].onesignal
+  MIN_IOS_VERSION: 11
 
 preInfo:
   title: Welcome to the react-native-onesignal integration.
@@ -18,15 +19,15 @@ steps:
   - task: xcode
     label: Setting Deployment Target
     actions:
-      # set root project target minimum deployment version to 11.0
+      # set root project target minimum deployment version to MIN_IOS_VERSION
       - setDeploymentVersion:
-          min: 11
-        target: root
-
-      # set main target minimum deployment version to 11.0
-      - setDeploymentVersion:
-          min: 11
+          min: $[MIN_IOS_VERSION]
         target: main
+
+      # set main target minimum deployment version to MIN_IOS_VERSION
+      - setDeploymentVersion:
+          min: $[MIN_IOS_VERSION]
+        target: root
 
       # set extension version to same as main
       - setDeploymentVersion: $[IOS_DEPLOYMENT_VERSION]
