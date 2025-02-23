@@ -1,20 +1,36 @@
 steps:
   - task: prompt
     actions:
+      - text: Enter camera usage description to be added to Info.plist as NSCameraUsageDescription
+        name: camera_usage_description
+        type: text
+        defaultValue: $(PRODUCT_NAME) needs access to your Camera.
+        placeholder: $(PRODUCT_NAME) needs access to your Camera.
+
       - name: microphone
         type: boolean
-        text: Add microphone permissions?
+        text: Do you want to record audio?
+
+      - when:
+          microphone: true
+        text: Enter microphone usage description to be added to Info.plist as NSMicrophoneUsageDescription
+        name: mic_usage_description
+        type: text
+        defaultValue: $(PRODUCT_NAME) needs access to your Microphone.
+        placeholder: $(PRODUCT_NAME) needs access to your Microphone.
+
   - task: plist
     label: Updating Info.plist
     actions:
       - set:
-          NSCameraUsageDescription: $(PRODUCT_NAME) needs access to your Camera.
+          NSCameraUsageDescription: $[camera_usage_description]
         strategy: append
       - when:
           microphone: true
         set:
-          NSMicrophoneUsageDescription: $(PRODUCT_NAME) needs access to your Microphone.
+          NSMicrophoneUsageDescription: $[mic_usage_description]
         strategy: append
+
   - task: android_manifest
     label: Updating android manifest
     actions:
