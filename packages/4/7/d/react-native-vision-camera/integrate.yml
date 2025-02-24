@@ -103,21 +103,21 @@ steps:
       # disable frame processors
       - when:
           features: disable_frame_processors
-        ifNotPresent: VisionCamera_enableCodeScanner
+        ifNotPresent: VisionCamera_enableFrameProcessors
         append: VisionCamera_enableFrameProcessors=false
         name: fp_injector
       - when:
           features: disable_frame_processors
           fp_injector: skipped
-        search: VisionCamera_enableCodeScanner
-        replace: VisionCamera_enableCodeScanner=false
+        search: VisionCamera_enableFrameProcessors
+        replace: VisionCamera_enableFrameProcessors=false
 
       # enable frame processors
       - when:
           $not:
             features: disable_frame_processors
-        search: VisionCamera_enableCodeScanner
-        replace: VisionCamera_enableCodeScanner=true
+        search: VisionCamera_enableFrameProcessors
+        replace: VisionCamera_enableFrameProcessors=true
 
   - task: podfile
     label: Updating Podfile
