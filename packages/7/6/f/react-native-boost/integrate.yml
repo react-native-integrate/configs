@@ -1,0 +1,114 @@
+steps:
+  - task: prompt
+    actions:
+      - text: Enable verbose logging?
+        name: verbose
+        type: boolean
+        initialValue: false
+
+      - text: glob patterns to ignore when performing optimizations
+        name: ignore
+        type: select
+        options:
+          - value: "[]"
+            label: Default
+            hint: "[]"
+          - value: "['node_modules/**']"
+            label: node_modules
+            hint: "['node_modules/**']"
+          - value: custom
+            label: customize
+            hint: you will be asked for custom pattern
+
+      - when:
+          ignore: custom
+        text: Enter custom glob patterns to ignore when performing optimizations as an array
+        name: ignore_custom_text
+        type: text
+        initialValue: "['node_modules/**']"
+        defaultValue: "['node_modules/**']"
+
+      - text: Select optimizers
+        name: optimizers
+        type: multiselect
+        initialValues:
+          - text
+          - view
+        options:
+          - value: text
+          - value: view
+
+      - text: Enable only in development or production mode?
+        name: envOnly
+        type: select
+        options:
+          - value: all
+            label: No, always enable
+          - value: development
+            label: development only
+          - value: production
+            label: production only
+          - value: custom
+            label: customize
+            hint: you will be asked for custom environments
+
+      - when:
+          envOnly: custom
+        text: Enter custom environment to enable. You can add multiple environments with a comma (,) separator.
+        name: envOnly_custom_text
+        type: text
+        defaultValue: all
+
+  - task: script
+    actions:
+      - script: |-
+          const config = [
+            'react-native-boost/plugin',
+            {
+              verbose: verbose,
+              ignores: {__$raw: ignore === 'custom' ? ignore_custom_text : ignore},
+              optimizers: {
+                text: optimizers.includes('text'),
+                view: optimizers.includes('view'),
+              },
+            },
+          ];
+          if (envOnly === 'all') {
+            await babel_config([{
+              set: {
+                plugins: [{
+                  $search: 'react-native-boost/plugin',
+                  $delete: true
+                }],
+              }
+            }, {
+              set: {
+                plugins: [config],
+              }
+            }]);
+          } else {
+            const envNames = envOnly === 'custom' ? envOnly_custom_text.split(',')
+              : [envOnly];
+            for (const envName of envNames) {
+              await babel_config([{
+                set: {
+                  env: {
+                    [envName]: {
+                      plugins: [{
+                        $search: 'react-native-boost/plugin',
+                        $delete: true
+                      }],
+                    }
+                  }
+                }
+              }, {
+                set: {
+                  env: {
+                    [envName]: {
+                      plugins: [config],
+                    }
+                  }
+                }
+              }])
+            }
+          }
