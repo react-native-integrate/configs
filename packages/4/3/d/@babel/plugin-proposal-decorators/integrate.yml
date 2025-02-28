@@ -14,7 +14,10 @@ steps:
   - task: babel_config
     label: Adding to babel.config.js
     actions:
-      - block: plugins
-        ifNotPresent: "@babel/plugin-proposal-decorators"
-        prepend: |-
-          ["@babel/plugin-proposal-decorators", {"version": "$[version]"}]
+      - set:
+          plugins:
+            - $search: "@babel/plugin-proposal-decorators"
+              $delete: true
+      - set:
+          plugins:
+            - $prepend: ["@babel/plugin-proposal-decorators", {"version": "$[version]"}]
