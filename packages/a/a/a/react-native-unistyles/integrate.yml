@@ -1,0 +1,32 @@
+minVersion: ^3
+preInfo:
+  title: Welcome to the react-native-unistyles integration.
+  message: |-
+    This script will modify your babel.config.js to support unistyles              
+    
+    You can configure unistyles babel plugin options by adding a plugin to integrate.config.js  
+    
+    Example:                                                                                    
+    
+    module.exports = {                                                                          
+      plugins: [                                                                                
+        ['react-native-unistyles', {                                                            
+          babel: unistylesPluginOptions                                                         
+        }]                                                                                      
+      ]                                                                                         
+    }
+
+steps:
+  - task: script
+    actions:
+      - script: |-
+          const babelConfig = get("config.babel");
+          
+          const plugin = ['react-native-unistyles/plugin'];
+          if (babelConfig)
+            plugin.push(babelConfig);
+          
+          await babel_config([
+            {set: {plugins: [{"$search":"react-native-unistyles","$delete":true}]}},
+            {set: {plugins: [plugin]}},
+          ])
