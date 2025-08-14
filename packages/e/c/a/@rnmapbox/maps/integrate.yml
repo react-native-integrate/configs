@@ -15,6 +15,24 @@ steps:
         text: "Enter Mapbox Downloads Token for Android"
         type: text
 
+      - name: location
+        type: boolean
+        text: Planning to display the user's location on the map or get the user's location information?
+      - name: precise
+        when:
+          platform: android
+          location: true
+        type: boolean
+        text: Precise location?
+
+      - when:
+          location: true
+        text: Enter location usage description to be added to Info.plist as NSLocationWhenInUseUsageDescription
+        name: location_usage_description
+        type: text
+        defaultValue: $(PRODUCT_NAME) needs access to your location.
+        placeholder: $(PRODUCT_NAME) needs access to your location.
+
   - task: prompt
     when:
       platform: ios
@@ -26,11 +44,11 @@ steps:
       title: Verify .netrc
       message: |
         Make sure your .netrc is configured with your secret access token, as described by the mapbox docs. To verify execute:
-  
+        
             grep -A 4 api.mapbox.com ~/.netrc
         
         This should output something like:
-  
+        
             machine api.mapbox.com
               login mapbox
               password $[ios_key]
@@ -60,6 +78,8 @@ steps:
     when:
       platform: android
     actions:
+      - block: buildscript.ext
+        append: RNMapboxMapsImpl = "mapbox"
       - block: allprojects.repositories
         append: |-2
           maven {
@@ -75,3 +95,25 @@ steps:
                 password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
             }
           }
+
+  - task: android_manifest
+    when:
+      platform: android
+      location: true
+    label: Updating android manifest
+    actions:
+      - append: <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        before: <application
+      - when:
+          precise: true
+        append: <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+        before: <application
+
+  - task: plist
+    label: Updating Info.plist
+    when:
+      platform: ios
+      location: true
+    actions:
+      - set:
+          NSLocationWhenInUseUsageDescription: $[location_usage_description]
