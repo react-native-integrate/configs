@@ -1,4 +1,4 @@
 steps:
   - task: shell
     actions:
-      - command: npx rnvi-update-plist package.json ios/AppName/Info.plist
+      - command: npx rnvi-update-plist package.json ios/$[IOS_PROJECT_NAME]/Info.plist
