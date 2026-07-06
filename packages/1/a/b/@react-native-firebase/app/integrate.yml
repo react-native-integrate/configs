@@ -75,12 +75,20 @@ steps:
         prepend: "FirebaseApp.configure()"
 
   - task: podfile
-    label: Altering CocoaPods to use frameworks
+    label: Configuring CocoaPods for Firebase (static frameworks)
     when:
       platform: ios
     actions:
       - prepend: "$RNFirebaseAsStaticFramework = true"
-      # use dynamic frameworks and disable flipper
-      - useFrameworks: static
-        disableFlipper: true
+      # Build Firebase as static frameworks WITHOUT forcing a global `use_frameworks!`.
+      # On the New Architecture the prebuilt React-Core is non-modular, so
+      # `use_frameworks!` makes RNFBApp/RNFBAnalytics compile as framework modules that
+      # then fail to import React headers (e.g. "declaration of 'RCTBridgeModule' must be
+      # imported from module 'RNFBApp'"). Instead, opt Firebase's Swift-pod ObjC
+      # dependency (GoogleUtilities) into modular headers so FirebaseCoreInternal can
+      # import it under the default static-library linkage.
+      - block: target
+        ifNotPresent: "pod 'GoogleUtilities', :modular_headers => true"
+        prepend: "pod 'GoogleUtilities', :modular_headers => true"
+      - disableFlipper: true
     postInfo: Podfile was changed, do not forget to run `pod install` after integration.
